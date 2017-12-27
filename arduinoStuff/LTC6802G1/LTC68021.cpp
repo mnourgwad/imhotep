@@ -39,7 +39,7 @@ http://www.linear.com/solutions/Linduino
 
 #include <stdint.h>
 #include <Arduino.h>
-#include "Linduino.h"
+#include "hardwareDescription.h"
 #include "LT_SPI.h"
 #include "LTC68021.h"
 #include <SPI.h>
