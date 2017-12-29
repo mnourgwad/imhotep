@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".OverallBattery">
+        <activity android:name=".OverallBattery"
+            android:label="Charge Average">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,7 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SeparateBatteries"
+                  android:label="Charge Details"
                   android:parentActivityName=".OverallBattery" />
     </application>
-
 </manifest>
