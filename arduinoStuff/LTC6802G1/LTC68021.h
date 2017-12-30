@@ -77,4 +77,6 @@ void spi_write_read(uint8_t *TxData,      //!< array of data to be written on th
                     uint8_t RXlen       //!< number of bytes to be read from the SPI port.
                    );
 
+void serialPrint(uint8_t CMD_LEN,uint8_t *cmd);
+
 #endif

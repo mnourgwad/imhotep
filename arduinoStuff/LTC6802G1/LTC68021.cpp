@@ -86,8 +86,16 @@ void LTC6802_wrcfg(uint8_t total_ic,uint8_t config[][6])
   output_low(LTC6802_CS);
   spi_write_array(CMD_LEN, cmd);
   output_high(LTC6802_CS);
-  
+  serialPrint(CMD_LEN, cmd);
   free(cmd);
+}
+
+void serialPrint(uint8_t CMD_LEN,uint8_t *cmd){
+  for (uint8_t i=0 ; i<CMD_LEN ; i++){
+    Serial.print(cmd[i], HEX);
+    Serial.print(",  ");
+  }
+  Serial.println();
 }
 
 
