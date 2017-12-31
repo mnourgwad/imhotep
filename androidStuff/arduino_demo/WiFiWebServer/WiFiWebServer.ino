@@ -16,10 +16,6 @@ WiFiServer server(80);
 void setup() {
   Serial.begin(115200);
   delay(10);
-
-  // prepare GPIO2
-  pinMode(2, OUTPUT);
-  digitalWrite(2, 0);
   
   // Connect to WiFi network
   Serial.println();
