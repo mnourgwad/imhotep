@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Charge</string>
+    <string name="arduino_ip">Arduino Ip</string>
+    <string name="arduino_port">Arduino Port</string>
 </resources>
