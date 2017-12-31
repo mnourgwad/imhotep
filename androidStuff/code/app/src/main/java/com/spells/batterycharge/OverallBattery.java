@@ -1,33 +1,52 @@
 package com.spells.batterycharge;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 
-public class OverallBattery extends AppCompatActivity implements View.OnTouchListener{
+import com.spells.batterycharge.Enums.ConnectionStatus;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+
+public class OverallBattery extends AppCompatActivity {
+
+
+    private OverallBatteryView overallBatteryView;
     private int noOfBatteries;
     private float[] readings;
     private float maxReading;
+
+    private EditText arduinoIpEdtTxt;
+    private EditText arduinoPortEdtTxt;
+
+    private String arduinoIp;
+    private int arduinoPort;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        noOfBatteries = 3;
-        readings = new float[]{253, 276, 264};
+        noOfBatteries = 4;
+        readings = new float[]{253, 276, 264, 294};
         maxReading = 350;
-
-        OverallBatteryView overallBatteryView = new OverallBatteryView(this, noOfBatteries, readings, maxReading);
-        overallBatteryView.setBackgroundColor(Color.WHITE);
-        setContentView(overallBatteryView);
-        overallBatteryView.setOnTouchListener(this);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -47,20 +66,143 @@ public class OverallBattery extends AppCompatActivity implements View.OnTouchLis
             imageView.setLayoutParams(layoutParams);
             actionBar.setCustomView(imageView);
         }
+
+        arduinoIpEdtTxt   = findViewById(R.id.arduino_ip);
+        arduinoPortEdtTxt = findViewById(R.id.arduino_port);
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.arduino_address_dialog, null);
+        dialogBuilder.setTitle("Enter Arduino address:");
+        dialogBuilder.setView(dialogView);
+        arduinoIpEdtTxt   = dialogView.findViewById(R.id.arduino_ip);
+        arduinoPortEdtTxt = dialogView.findViewById(R.id.arduino_port);
+                dialogBuilder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                arduinoIp   = arduinoIpEdtTxt.getText().toString();
+                arduinoPort = Integer.parseInt(arduinoPortEdtTxt.getText().toString());
+
+                wifiConnect();
+            }
+        });
+
+        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        int action = event.getAction();
+    private void wifiConnect() {
+        new WifiTask(arduinoIp, arduinoPort, this).execute();
+    }
 
-        if (action == MotionEvent.ACTION_UP) {
-            Intent intent = new Intent(this, SeparateBatteries.class);
-            intent.putExtra("NoOfBatteries", noOfBatteries);
-            intent.putExtra("Readings", readings);
-            intent.putExtra("MaxReading", maxReading);
-            startActivity(intent);
+    /*
+     * Wifi connection AsyncTask
+     * adapted from https://github.com/hmartiro/android-arduino-wifi
+     */
+    private class WifiTask extends AsyncTask<Void, Void, Void> {
+
+        private String arduinoIp;
+        private int arduinoPort;
+
+        private Context context;
+
+        private Socket socket = null;
+        private BufferedReader inputStream = null;
+        private OutputStream outputStream = null;
+
+        private int timeout = 10000;
+
+        private AlertDialog.Builder builder;
+        private AlertDialog alertDialog;
+
+        private ConnectionStatus connectionStatus;
+
+        WifiTask(String arduinoIp, int arduinoPort, Context context) {
+            this.arduinoIp   = arduinoIp;
+            this.arduinoPort = arduinoPort;
+            this.context     = context;
         }
 
-        return true;
+        @Override
+        protected void onPreExecute() {
+            builder = new AlertDialog.Builder(context);
+            builder.setMessage("Connecting...");
+            builder.setCancelable(false);
+            alertDialog = builder.create();
+            alertDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            socket = new Socket();
+            try {
+                socket.connect(new InetSocketAddress(arduinoIp, arduinoPort), timeout);
+                inputStream  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                outputStream = socket.getOutputStream();
+
+                if (socket.isConnected()) {
+                    Log.e("CONNECT", "CONNECTED");
+                    outputStream.write("Batteries".getBytes());
+                    outputStream.write('\n');
+                    String batteries = new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine();
+                    noOfBatteries = Integer.parseInt(batteries);
+                    Log.e("BATTERIES", batteries);
+
+                    /* outputStream.write("max".getBytes());
+                    outputStream.write('\n');
+                    String max = new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine();
+                    maxReading = Integer.parseInt(max);
+                    Log.e("MAX", max); */
+
+                    connectionStatus = ConnectionStatus.CONNECTED;
+
+                    overallBatteryView = new OverallBatteryView(context, noOfBatteries, readings, maxReading, connectionStatus);
+                    overallBatteryView.setBackgroundColor(Color.WHITE);
+                    publishProgress();
+                } else {
+                    Log.e("CONNECT", "Socket did not connect!");
+                    connectionStatus = ConnectionStatus.FAILURE;
+                }
+            } catch (IOException e) {
+                // e.printStackTrace();
+                Log.e("CONNECT", "Socket did not connect!");
+                connectionStatus = ConnectionStatus.FAILURE;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            alertDialog.cancel();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            setContentView(overallBatteryView);
+            overallBatteryView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    int action = event.getAction();
+
+                    if (action == MotionEvent.ACTION_UP) {
+                        Intent intent = new Intent(context, SeparateBatteries.class);
+                        intent.putExtra("NoOfBatteries", noOfBatteries);
+                        intent.putExtra("Readings", readings);
+                        intent.putExtra("MaxReading", maxReading);
+                        startActivity(intent);
+                    }
+
+                    return true;
+                }
+            });
+        }
     }
 }
