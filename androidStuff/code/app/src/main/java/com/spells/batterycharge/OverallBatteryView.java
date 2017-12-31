@@ -1,10 +1,15 @@
 package com.spells.batterycharge;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.spells.batterycharge.Enums.ConnectionStatus;
 
 import java.text.DecimalFormat;
 
@@ -18,8 +23,15 @@ public class OverallBatteryView extends View {
     private int noOfBatteries;
     private float[] readings;
     private float maxReading;
+    private ConnectionStatus connectionStatus;
 
     private DecimalFormat decimalFormat;
+
+    private Bitmap footerLogos;
+
+    private Bitmap wifiConnected;
+    private Bitmap wifiDisconnected;
+    private Bitmap wifiFailure;
 
     private void init() {
         paintBattery = new Paint();
@@ -44,13 +56,20 @@ public class OverallBatteryView extends View {
         paintText.setTextSize(40);
     }
 
-    public OverallBatteryView(Context context, int noOfBatteries, float[] readings, float maxReading) {
+    public OverallBatteryView(Context context, int noOfBatteries, float[] readings, float maxReading, ConnectionStatus connectionStatus) {
         super(context);
         init();
-        this.noOfBatteries = noOfBatteries;
-        this.readings      = readings;
-        this.maxReading    = maxReading;
+        this.noOfBatteries    = noOfBatteries;
+        this.readings         = readings;
+        this.maxReading       = maxReading;
+        this.connectionStatus = connectionStatus;
         decimalFormat = new DecimalFormat("#.#");
+
+        footerLogos = BitmapFactory.decodeResource(context.getResources(), R.drawable.footer_logos);
+
+        wifiConnected    = BitmapFactory.decodeResource(context.getResources(), R.drawable.wifi_green);
+        wifiDisconnected = BitmapFactory.decodeResource(context.getResources(), R.drawable.wifi_red);
+        wifiFailure      = BitmapFactory.decodeResource(context.getResources(), R.drawable.wifi_gray);
     }
 
     public OverallBatteryView(Context context, AttributeSet attrs) {
@@ -86,6 +105,16 @@ public class OverallBatteryView extends View {
         canvas.drawRoundRect(start_x, start_y + 120, start_x + 200, start_y + 400, 4, 4, paintCharge);
         canvas.drawText(decimalFormat.format(overallChargePercentage) + "%", start_x + 50, start_y + 200, paintText);
         canvas.drawText(decimalFormat.format(overallCharge) + "/" + decimalFormat.format(maxReading * noOfBatteries), start_x + 20, start_y + 440, paintText);
+
+        if (connectionStatus == ConnectionStatus.CONNECTED) {
+            canvas.drawBitmap(wifiConnected, null, new Rect(35, (int) height - 150, 80, (int) height - 110), null);
+        } else if (connectionStatus == ConnectionStatus.DISCONNECTED) {
+            canvas.drawBitmap(wifiDisconnected, null, new Rect(35, (int) height - 150, 80, (int) height - 110), null);
+        } else {
+            canvas.drawBitmap(wifiFailure, null, new Rect(35, (int) height - 150, 80, (int) height - 110), null);
+        }
+
+        canvas.drawBitmap(footerLogos, null, new Rect(20, (int) height - 80, (int) width - 40, (int) height), null);
     }
 
     @Override
