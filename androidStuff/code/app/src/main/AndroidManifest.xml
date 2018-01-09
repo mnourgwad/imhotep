@@ -25,7 +25,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".SeparateBatteries"
-                  android:label="Charge Details"
-                  android:parentActivityName=".OverallBattery" />
+                  android:label="Charge Details"/>
     </application>
 </manifest>

@@ -44,8 +44,6 @@ public class SeparateBatteries extends AppCompatActivity {
 
             imageView.setLayoutParams(layoutParams);
             actionBar.setCustomView(imageView);
-
-            actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 }
