@@ -6,8 +6,14 @@
 
 #include <ESP8266WiFi.h>
 
+// WiFi connection credentials
 const char* ssid = "ssid";
-const char* password = "pasword";
+const char* password = "password";
+
+// Dummy data for testing
+String noOfBatteries = "4";
+String maxReading    = "350";
+float readings[]  = {240, 273, 145, 168};
 
 // Create an instance of the server
 // specify the port to listen on as an argument
@@ -59,13 +65,22 @@ void loop() {
   client.flush();
   
   // Match the request
-  int val;
-  if (req.indexOf("Batteries") != -1) {
-    val = 4;
-    client.print(val);
-    delay(1);
-  } else if (req.indexOf("max") != -1) {
-    val = 350;
+  String val;
+  if (req.equals("ConfigData")) {
+
+    // convert the float array to string
+    String readingsQuery = "";
+    for (int i = 0; i < noOfBatteries.toInt(); i++) {
+      if (i != noOfBatteries.toInt() - 1) {
+        readingsQuery += readings[i];
+        readingsQuery += ",";
+      } else {
+        readingsQuery += readings[i];
+      }
+    }
+
+    // join all the data in one string
+    val = noOfBatteries + "-" + maxReading + "-" + readingsQuery;
     client.print(val);
     delay(1);
   } else {
