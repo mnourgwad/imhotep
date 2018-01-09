@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/reconnect"
+        android:title="@string/reconnect"/>
+    <item
+        android:id="@+id/connect_information"
+        android:title="@string/change_arduino_address"
+        />
+    <item
+        android:id="@+id/no_of_batteries"
+        android:title="@string/no_of_batteries"/>
+    <item
+        android:id="@+id/max_charge"
+        android:title="@string/max_charge"/>
+    <item
+        android:id="@+id/conversion_factor"
+        android:title="@string/conversion_factor"/>
+</menu>
