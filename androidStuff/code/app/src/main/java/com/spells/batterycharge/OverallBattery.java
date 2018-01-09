@@ -37,6 +37,7 @@ public class OverallBattery extends AppCompatActivity {
     private int noOfBatteries = 0;
     private float[] readings = null;
     private float maxReading = 0;
+    private float conversionFactor;
 
     private EditText arduinoIpEdtTxt;
     private EditText arduinoPortEdtTxt;
@@ -50,13 +51,11 @@ public class OverallBattery extends AppCompatActivity {
 
     private ConnectionStatus connectionStatus;
 
+    private boolean cancelChangeArduinoAddress = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        /* noOfBatteries = 4;
-        readings = new float[]{253, 276, 264, 294};
-        maxReading = 350; */
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -77,6 +76,10 @@ public class OverallBattery extends AppCompatActivity {
             actionBar.setCustomView(imageView);
         }
 
+        connectToArduino();
+    }
+
+    private void connectToArduino() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         LayoutInflater inflater = this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.arduino_address_dialog, null);
@@ -84,6 +87,7 @@ public class OverallBattery extends AppCompatActivity {
         dialogBuilder.setView(dialogView);
         arduinoIpEdtTxt = dialogView.findViewById(R.id.arduino_ip);
         arduinoPortEdtTxt = dialogView.findViewById(R.id.arduino_port);
+        dialogBuilder.setCancelable(false);
         dialogBuilder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -93,6 +97,16 @@ public class OverallBattery extends AppCompatActivity {
                 wifiConnect();
             }
         });
+
+        if (cancelChangeArduinoAddress) {
+            dialogBuilder.setCancelable(true);
+            dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+        }
 
         AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
@@ -142,16 +156,99 @@ public class OverallBattery extends AppCompatActivity {
 
         switch (itemClicked) {
             case R.id.no_of_batteries:
+                setConfigData("Batteries");
                 break;
             case R.id.max_charge:
+                setConfigData("MaxReading");
                 break;
             case R.id.conversion_factor:
+                setConfigData("ConversionFactor");
+                break;
+            case R.id.reconnect:
+                wifiConnect();
+                break;
+            case R.id.connect_information:
+                cancelChangeArduinoAddress = true;
+                connectToArduino();
                 break;
             default:
                 break;
         }
 
         return true;
+    }
+
+    private void setConfigData(String dataToBeSet) {
+        final EditText dataNewValue;
+
+        AlertDialog.Builder builder;
+        AlertDialog alertDialog;
+
+        builder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.set_config_data_dialog, null);
+        builder.setView(dialogView);
+        dataNewValue = dialogView.findViewById(R.id.data_new_value);
+
+        switch (dataToBeSet) {
+            case "Batteries":
+                dataNewValue.setHint("New No. Of batteries");
+                builder.setTitle("No. Of Batteries");
+                builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        noOfBatteries = Integer.parseInt(dataNewValue.getText().toString());
+                        constructUI();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                alertDialog = builder.create();
+                alertDialog.show();
+                break;
+            case "MaxReading":
+                dataNewValue.setHint("New Max Charge");
+                builder.setTitle("Max Charge");
+                builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        maxReading = Integer.parseInt(dataNewValue.getText().toString());
+                        constructUI();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                alertDialog = builder.create();
+                alertDialog.show();
+                break;
+            case "ConversionFactor":
+                dataNewValue.setHint("New Conversion factor");
+                builder.setTitle("Conversion Factor");
+                builder.setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        conversionFactor = Integer.parseInt(dataNewValue.getText().toString());
+                        constructUI();
+                    }
+                }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                alertDialog = builder.create();
+                alertDialog.show();
+                break;
+            default:
+                break;
+        }
     }
 
     /*
