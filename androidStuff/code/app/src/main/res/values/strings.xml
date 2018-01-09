@@ -2,4 +2,9 @@
     <string name="app_name">Charge</string>
     <string name="arduino_ip">Arduino Ip</string>
     <string name="arduino_port">Arduino Port</string>
+    <string name="no_of_batteries">No. of Batteries</string>
+    <string name="max_charge">Max Charge</string>
+    <string name="conversion_factor">Conversion Factor</string>
+    <string name="reconnect">Reconnect</string>
+    <string name="change_arduino_address">Change Arduino Address</string>
 </resources>
