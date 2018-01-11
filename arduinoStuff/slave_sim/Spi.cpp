@@ -15,7 +15,7 @@ void SPI::mode(byte config){
 //  initialize the SPI pins
   pinMode(SCK_PIN, OUTPUT);
   pinMode(MOSI_PIN, OUTPUT);
-  pinMode(MISO_PIN, INPUT);
+  pinMode(MISO_PIN, INPUT_PULLUP);
   pinMode(SS_PIN, OUTPUT);
 
 //  enable SPI master with configuration byte specified
@@ -25,10 +25,10 @@ void SPI::mode(byte config){
 
 void SPI::SPI_SlaveInit(void){
 //  Set MISO output, all others input 
-  pinMode(SCK_PIN, INPUT);
-  pinMode(MOSI_PIN, INPUT);
+  pinMode(SCK_PIN, INPUT_PULLUP);
+  pinMode(MOSI_PIN, INPUT_PULLUP);
   pinMode(MISO_PIN, OUTPUT);
-  pinMode(SS_PIN, INPUT);
+  pinMode(SS_PIN, INPUT_PULLUP);
 
 //  SPIE=0, SPE=1, DORD=0, MSTR=0, CPOL=0, CPOL=0, SPR=00
   SPCR = B01000000;

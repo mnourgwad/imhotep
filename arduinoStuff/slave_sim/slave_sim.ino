@@ -47,6 +47,18 @@ void loop(){
     i = 0;        // resetting the index pointer to the first location 'index 0'
   }
 
+/* part of code to test the operation of PEC calculation function*/
+  if(Serial.available()){
+    uint8_t c[1];
+    c[0] = Serial.parseInt(16);
+    Serial.print("PEC of 0x");
+    Serial.print(c[0], HEX);
+    Serial.print(" is: 0x");
+    Serial.println(calculatePEC(1, c), HEX);
+    while(Serial.available()){
+      Serial.read();
+    }
+  }
 }
 
 void print_rx(){
