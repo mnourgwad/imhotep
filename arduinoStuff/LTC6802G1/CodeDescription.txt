@@ -1,0 +1,64 @@
+This file describes briefly what each code-file contains:
+	1.LTC6802G1.ino
+		This is the main arduino file that contain the loop method.
+		#_Implemented Functions:
+			01. setup()
+			02. loop()
+			03. run_command(uint32_t cmd)
+			04. init_cfg()
+			05. print_menu()
+			06. print_cells()
+			07. print_temp()
+			08. void print_config()
+			09. print_rxconfig()
+			10. serial_print_hex(data)
+	
+	2. LTC68021.h
+		This library file contains the definitions related to the LTC68021 chip
+		#_Defined Constants:
+			01. LTC6802_CS QUIKEVAL_CS
+			02. PEC_POLY 7
+			
+		#_Defined Functions:
+			01. LTC6802_initialize()
+			02. LTC6802_stcvad()
+			03. LTC6802_sttmpad()
+			04. LTC6802_rdcv(total_ic, cell_codes[][12])
+			05. LTC6802_rdtmp(total_ic, temp_codes[][3])
+			06. LTC6802_wrcfg(total_ic, config[][6])
+			07. LTC6802_rdcfg(total_ic, r_config[][7])
+			08. pec8_calc(len, *data)
+			09. spi_write_array(length, *data)
+			10. spi_write_read(*TxData, TXlen, *rx_data, RXlen)
+			11. serialPrint(CMD_LEN, *cmd)
+			
+	3. LTC68021.cpp
+		This file contains the functions implementation defined in the .h file
+		
+	4. LT_SPI.h
+		This library file contains the definitions needed in the SPI communication
+		#_Defined Functions:
+			01. spi_transfer_byte(cs_pin, tx, *rx )
+			02. spi_transfer_word(cs_pin, tx, *rx )
+			03. spi_transfer_block(cs_pin, *tx, *rx, length )
+			04. quikeval_SPI_connect()
+			05. quikeval_SPI_init()
+			06. spi_enable(spi_clock_divider)
+			07. spi_disable()
+			08. spi_write(data)
+			09. spi_read(data);
+	
+	5. UserInterface.h
+		This library contains functions used to read and write user data through the Arduino's serial interface
+		#_Defined Constants:
+			01. UI_BUFFER_SIZE 64
+			02. SERIAL_TERMINATOR '\n'
+			
+		#_Defined Functions:
+			01. read_data()
+			02. read_float()
+			03. read_int()
+			04. *read_string()
+			05. read_char()
+
+
