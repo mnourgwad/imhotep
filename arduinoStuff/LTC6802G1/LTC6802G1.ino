@@ -116,8 +116,7 @@ uint8_t rx_cfg[TOTAL_IC][7];
 
 
 //! Inititializes hardware and variables
-void setup()
-{
+void setup(){
   Serial.begin(115200);
   LTC6802_initialize(); //Initialize LTC6802 hardware
   init_cfg();        	//initialize the 6802 configuration array to be written
@@ -224,7 +223,6 @@ void run_command(uint32_t cmd)
           input = read_char();
         }
 
-
         LTC6802_stcvad();
         delay(10);
 
@@ -233,13 +231,7 @@ void run_command(uint32_t cmd)
           Serial.println(F("A PEC error was detected in the received data"));
         }
         print_cells();
-
-
-        if (error == -1){
-          Serial.println(F("A PEC error was detected in the received data"));
-        }
-        // print_rxconfig();
-
+        
         delay(500);
       }
       print_menu();
@@ -253,22 +245,31 @@ void run_command(uint32_t cmd)
 
 
 //! Initializes the configuration array
-void init_cfg()
-{
+void init_cfg(){
   for (int i = 0; i<TOTAL_IC; i++){
+    // CFGR0 : WDT GPIO2 GPIO1 LVLPL CELL10 CDC[2] CDC[1] CDC[0]
     tx_cfg[i][0] = 0xF1;
+    
+    // CFGR1 : DCC8 DCC7 DCC6 DCC5 DCC4 DCC3 DCC2 DCC1
     tx_cfg[i][1] = 0x00 ;
+
+    //CFGR2 : MC4I MC3I MC2I MC1I DCC12 DCC11 DCC10 DCC9
     tx_cfg[i][2] = 0x00 ;
+
+    //CFGR3 : MC12I MC11I MC10I MC9I MC8I MC7I MC6I MC5I
     tx_cfg[i][3] = 0x00 ;
+
+    //CFGR4 : VUV[7] VUV[6] VUV[5] VUV[4] VUV[3] VUV[2] VUV[1] VUV[0]
     tx_cfg[i][4] = 0x00 ;
+
+    //CFGR5 : VOV[7] VOV[6] VOV[5] VOV[4] VOV[3] VOV[2] VOV[1] VOV[0]
     tx_cfg[i][5] = 0x00 ;
   }
 }
 
 
 //! Prints the main menu
-void print_menu()
-{
+void print_menu(){
   Serial.println(F("Please enter LTC6802LTC6802 Command"));
   Serial.println(F("1: Write Configuration"));
   Serial.println(F("2: Read Configuration"));
@@ -285,8 +286,7 @@ void print_menu()
 
 
 //!Prints cell coltage codes to the serial port
-void print_cells()
-{
+void print_cells(){
   for (int current_ic = 0 ; current_ic < TOTAL_IC; current_ic++){
     Serial.print(" IC ");
     Serial.print(current_ic+1,DEC);
@@ -305,8 +305,7 @@ void print_cells()
 
 
 //!Prints GPIO voltage codes and Vref2 voltage code onto the serial port
-void print_temp()
-{
+void print_temp(){
   for (int current_ic =0 ; current_ic < TOTAL_IC; current_ic++){
     Serial.print(" IC ");
     Serial.print(current_ic+1,DEC);
@@ -342,7 +341,7 @@ void print_config()
     Serial.print(", 0x");   serial_print_hex(tx_cfg[current_ic][5]);
     Serial.print(", Calculated PEC: 0x");    
     cfg_pec = pec8_calc(6,&tx_cfg[current_ic][0]);
-                            serial_print_hex((uint8_t)(cfg_pec>>8));
+    //serial_print_hex((uint8_t)(cfg_pec>>8));
     Serial.print(", 0x");   serial_print_hex((uint8_t)(cfg_pec));
     Serial.println();
   }

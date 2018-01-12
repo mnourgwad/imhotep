@@ -52,7 +52,7 @@ http://www.linear.com/solutions/Linduino
 //Initializes the SPI port
 void LTC6802_initialize()
 {
-  quikeval_SPI_connect();
+  // quikeval_SPI_connect();
   spi_enable(SPI_CLOCK_DIV16); // This will set the Linduino to have a 1MHz Clock
 
 }
@@ -61,25 +61,26 @@ void LTC6802_initialize()
 void LTC6802_wrcfg(uint8_t total_ic,uint8_t config[][6])
 {
   uint8_t BYTES_IN_REG = 6;
-  uint8_t CMD_LEN = 1+(6*total_ic);
+  uint8_t CMD_LEN = 2+(7*total_ic);
   uint8_t *cmd;
   uint16_t cfg_pec;
   uint8_t cmd_index; //command counter
 
   cmd = (uint8_t *)malloc(CMD_LEN*sizeof(uint8_t));
 
-  cmd[0] = 0x01; //WRCFG
-
-  cmd_index = 1;
+  cmd[0] = WRCFG;
+  cmd[1] = WRCFG_PEC;
+  
+  cmd_index = 2;
   for (uint8_t current_ic = total_ic; current_ic > 0; current_ic--){
     for (uint8_t current_byte = 0; current_byte < BYTES_IN_REG; current_byte++){
       cmd[cmd_index] = config[current_ic-1][current_byte];
-      cmd_index = cmd_index + 1;
+      cmd_index ++;
     }
 
     cfg_pec = pec8_calc(BYTES_IN_REG, &config[current_ic-1][0]);    // calculating the PEC for each ICs configuration register data
     cmd[cmd_index ] = (uint8_t)cfg_pec;
-    cmd_index = cmd_index + 1;
+    cmd_index ++;
   }
 
   //steps given in data sheet pp.27
@@ -146,8 +147,8 @@ int8_t LTC6802_rdcfg(uint8_t total_ic, //Number of ICs in the system
 void LTC6802_stcvad()
 {
   output_low(LTC6802_CS);
-  spi_write(0x10);
-  spi_write(0xB0);
+  spi_write(STCVAD);
+  spi_write(STCVAD_PEC);
   output_high(LTC6802_CS);
 }
 
@@ -156,16 +157,15 @@ void LTC6802_stcvad()
 void LTC6802_sttmpad()
 {
   output_low(LTC6802_CS);
-  spi_write(0x30);
-  spi_write(0x50);
+  spi_write(STTMPAD);
+  spi_write(STTMPAD_PEC);
   output_high(LTC6802_CS);
 }
 
 
 
 //Function that reads Temp Voltage registers
-int8_t LTC6802_rdtmp(uint8_t total_ic, uint16_t temp_codes[][3])
-{
+int8_t LTC6802_rdtmp(uint8_t total_ic, uint16_t temp_codes[][3]){
   int data_counter = 0;
   int pec_error = 0;
   uint8_t data_pec = 0;
@@ -174,13 +174,12 @@ int8_t LTC6802_rdtmp(uint8_t total_ic, uint16_t temp_codes[][3])
   rx_data = (uint8_t *) malloc((6*total_ic)*sizeof(uint8_t));
 
   output_low(LTC6802_CS);
-  spi_write(0x0E);
-  spi_write(0xEA);
-  for (int i=0; i<total_ic; i++)
-  {
-    for ( int j = 0; j<6 ; j++)
-    {
-      rx_data[data_counter++] =spi_read(0xFF);
+  spi_write(RDTMP);
+  spi_write(RDTMP_PEC);
+  for (int i=0; i<total_ic; i++){
+    for ( int j = 0; j<6 ; j++){
+      rx_data[data_counter] =spi_read(0xFF);
+      data_counter++;
     }
   }
   output_high(LTC6802_CS);
@@ -193,21 +192,27 @@ int8_t LTC6802_rdtmp(uint8_t total_ic, uint16_t temp_codes[][3])
   {
     received_pec =  rx_data[5 +(6*j)];
     data_pec = pec8_calc(5, &rx_data[(6*j)]);
-    if (received_pec != data_pec)
-    {
+    if (received_pec != data_pec){
       pec_error = -1;
-    }
+      data_counter += 6;
+    }else{
+      temp = rx_data[data_counter];
+      data_counter++;
+      temp2 = (uint16_t)((rx_data[data_counter]& 0x0F)<<8);
+      temp_codes[j][0] = temp + temp2 - 512;
+      
+      temp2 = (rx_data[data_counter])>>4;
+      data_counter++;
+      temp =  (rx_data[data_counter])<<4;
+      temp_codes[j][1] = temp + temp2 - 512;
 
-    temp = rx_data[data_counter++];
-    temp2 = (rx_data[data_counter]& 0x0F)<<8;
-    temp_codes[j][0] = temp + temp2 -512;
-    temp2 = (rx_data[data_counter++])>>4;
-    temp =  (rx_data[data_counter++])<<4;
-    temp_codes[j][1] = temp+temp2 -512;
-    temp2 = (rx_data[data_counter++]);
-    temp =  (rx_data[data_counter++]& 0x0F)<<8;
-    temp_codes[j][2] = temp+temp2 -512;
-    data_counter++;
+      data_counter++;
+      temp2 = (rx_data[data_counter]);
+      data_counter++;
+      temp =  (rx_data[data_counter]& 0x0F)<<8;
+      temp_codes[j][2] = temp + temp2 - 512;
+      data_counter+=2;
+    }
   }
   free(rx_data);
   return(pec_error);
@@ -215,8 +220,8 @@ int8_t LTC6802_rdtmp(uint8_t total_ic, uint16_t temp_codes[][3])
 
 
 // Function that reads Cell Voltage registers
-uint8_t LTC6802_rdcv( uint8_t total_ic, uint16_t cell_codes[][12])
-{
+uint8_t LTC6802_rdcv( uint8_t total_ic, uint16_t cell_codes[][12]){
+  
   int data_counter =0;
   int pec_error = 0;
   uint8_t data_pec = 0;
@@ -225,12 +230,10 @@ uint8_t LTC6802_rdcv( uint8_t total_ic, uint16_t cell_codes[][12])
   rx_data = (uint8_t *) malloc((19*total_ic)*sizeof(uint8_t));
 
   output_low(LTC6802_CS);
-  spi_write(0x04);
-  spi_write(0xDC);
-  for (int i=0; i<total_ic; i++)
-  {
-    for ( int j = 0; j<19 ; j++)
-    {
+  spi_write(RDCV);
+  spi_write(RDCV_PEC);
+  for (int i=0; i<total_ic; i++){
+    for ( int j = 0; j<19 ; j++){
       rx_data[data_counter++] =spi_read(0xFF);
     }
   }
@@ -240,32 +243,28 @@ uint8_t LTC6802_rdcv( uint8_t total_ic, uint16_t cell_codes[][12])
   data_counter = 0;
   uint16_t temp,temp2;
 
-
-  for (int j =0; j<total_ic; j++)
-  {
+  for (int j =0; j<total_ic; j++){
 
     received_pec =  rx_data[18 +(19*j)];
     data_pec = pec8_calc(18, &rx_data[(19*j)]);
-    if (received_pec != data_pec)
-    {
+    
+    if (received_pec != data_pec){
       pec_error = -1;
+      data_counter+=19;
+    }else{
+      for (int k = 0; k<12; k+=2){
+        temp = rx_data[data_counter];
+        data_counter++;
+        temp2 = (uint16_t)((rx_data[data_counter]&0x0F)<<8);
+        cell_codes[j][k] = temp + temp2 - 512;
+        
+        temp2 = (rx_data[data_counter])>>4;
+        data_counter++;
+        temp =  (rx_data[data_counter])<<4;
+        cell_codes[j][k+1] = temp + temp2 - 512;
+      }
+      data_counter+=2;
     }
-
-    for (int k = 0; k<12; k=k+2)
-    {
-
-      temp = rx_data[data_counter++];
-
-      temp2 = (uint16_t)(rx_data[data_counter]&0x0F)<<8;
-
-      cell_codes[j][k] = temp + temp2 -512;
-      temp2 = (rx_data[data_counter++])>>4;
-
-      temp =  (rx_data[data_counter++])<<4;
-
-      cell_codes[j][k+1] = temp+temp2 -512;
-    }
-    data_counter++;
   }
   free(rx_data);
   return(pec_error);
@@ -274,28 +273,19 @@ uint8_t LTC6802_rdcv( uint8_t total_ic, uint16_t cell_codes[][12])
 
 
 //Function that calculates PEC byte
-uint8_t pec8_calc(uint8_t len, uint8_t *data)
-{
-
+uint8_t pec8_calc(uint8_t len, uint8_t *data){
   uint8_t  remainder = 0x41;//PEC_SEED;
-
-
-  /*
-   * Perform modulo-2 division, a byte at a time.
-   */
+  
+  // Perform modulo-2 division, a byte at a time.
   for (int byte = 0; byte < len; ++byte){
-    /*
-     * Bring the next byte into the remainder.
-     */
+    
+    // Bring the next byte into the remainder.
     remainder ^= data[byte];
-
-    /*
-     * Perform modulo-2 division, a bit at a time.
-     */
+    
+    // Perform modulo-2 division, a bit at a time.
     for (uint8_t bit = 8; bit > 0; --bit){
-      /*
-       * Try to divide the current data bit.
-       */
+      
+      // Try to divide the current data bit.
       if (remainder & 128){
         remainder = (remainder << 1) ^ PEC_POLY;
       }else{
@@ -304,30 +294,25 @@ uint8_t pec8_calc(uint8_t len, uint8_t *data)
     }
   }
 
-  /*
-   * The final remainder is the CRC result.
-   */
+// The final remainder is the CRC result.
   return (remainder);
-
 }
 
 
 //Writes an array of bytes out of the SPI port
-void spi_write_array(uint8_t len,
-                     uint8_t data[]
-                    )
-{
-  for (uint8_t i = 0; i < len; i++){spi_write((int8_t)data[i]);}
+void spi_write_array(uint8_t len, uint8_t data[]){
+  for (uint8_t i = 0; i < len; i++){
+    spi_write((int8_t)data[i]);
+  }
 }
 
 
 //Writes and read a set number of bytes using the SPI port.
-void spi_write_read(uint8_t tx_Data[],
-                    uint8_t tx_len,
-                    uint8_t *rx_data,
-                    uint8_t rx_len
-                   )
-{
-  for (uint8_t i = 0; i < tx_len; i++){ spi_write(tx_Data[i]);}
-  for (uint8_t i = 0; i < rx_len; i++){ rx_data[i] = (uint8_t)spi_read(0xFF);}
+void spi_write_read(uint8_t tx_Data[], uint8_t tx_len, uint8_t *rx_data, uint8_t rx_len){
+  for (uint8_t i = 0; i < tx_len; i++){
+    spi_write(tx_Data[i]);
+  }
+  for (uint8_t i = 0; i < rx_len; i++){ 
+    rx_data[i] = (uint8_t)spi_read(0xFF);
+  }
 }
