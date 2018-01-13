@@ -6,12 +6,12 @@
  */ 
 
 void readAllCells(uint8_t IC_NUM){
-  /*  
-   * 1. send start_ADC_conversion command
-   * 2. send read_cell_voltage command
-   * 3. map values from uint16 to float
-   * 4. update CellVoltage global variables
-   */
+  // 1. send start_ADC_conversion command
+  LTC6802_stcvad();
+  // 2. send read_cell_voltage command
+  LTC6802_rdcv(TOTAL_IC, cell_codes);
+  // 3. print mapped values
+  print_cells();
 }
 
 float readCell(uint8_t IC_NUM, uint8_t CellNum){

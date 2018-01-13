@@ -20,7 +20,7 @@ class SPI{
     SPI(void);
     void mode(uint8_t);
     void SPI_SlaveInit(void);
-    uint8_t SPI_SlaveReceive(void);
+    uint8_t SPI_SlaveReceive(uint8_t c);
     uint8_t transfer(uint8_t);
     uint8_t transfer(uint8_t, uint8_t);
 };

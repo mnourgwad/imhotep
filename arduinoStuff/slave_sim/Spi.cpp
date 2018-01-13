@@ -35,9 +35,10 @@ void SPI::SPI_SlaveInit(void){
 }
 
 //------------------ receive -----------------------------------------------
-uint8_t SPI::SPI_SlaveReceive(void){
-  cmd_counter ++;
-  SPDR = cmd_counter;
+uint8_t SPI::SPI_SlaveReceive(uint8_t c){
+  //cmd_counter ++;
+  //SPDR = cmd_counter;
+  SPDR = c;
   /* Wait for reception complete */
   while((!(SPSR & (1<<SPIF))) && (digitalRead(SS_PIN) == LOW)){}
   //  while(!(SPSR & (1<<SPIF)))

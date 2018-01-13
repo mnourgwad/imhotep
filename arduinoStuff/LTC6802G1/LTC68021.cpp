@@ -53,7 +53,8 @@ http://www.linear.com/solutions/Linduino
 void LTC6802_initialize()
 {
   // quikeval_SPI_connect();
-  spi_enable(SPI_CLOCK_DIV16); // This will set the Linduino to have a 1MHz Clock
+//  spi_enable(SPI_CLOCK_DIV16); // This will set the Linduino to have a 1MHz Clock
+  spi_enable(SPI_CLOCK_DIV128); // This will set the Linduino to have a 1MHz Clock
 
 }
 
@@ -107,7 +108,7 @@ int8_t LTC6802_rdcfg(uint8_t total_ic, //Number of ICs in the system
 {
   uint8_t BYTES_IN_REG = 7;
 
-  uint8_t cmd[1];
+  uint8_t cmd[2];
   uint8_t *rx_data;
   int8_t pec_error = 0;
   uint8_t data_pec;
@@ -116,11 +117,12 @@ int8_t LTC6802_rdcfg(uint8_t total_ic, //Number of ICs in the system
   rx_data = (uint8_t *) malloc((BYTES_IN_REG*total_ic)*sizeof(uint8_t));
 
   //1
-  cmd[0] = 0x02; //RDCFG
+  cmd[0] = RDCFG;
+  cmd[1] = RDCFG_PEC;
 
 
   output_low(LTC6802_CS);
-  spi_write_read(cmd, 1, rx_data, (BYTES_IN_REG*total_ic)); //Read the configuration data of all ICs on the daisy chain into
+  spi_write_read(cmd, 2, rx_data, (BYTES_IN_REG*total_ic)); //Read the configuration data of all ICs on the daisy chain into
   output_high(LTC6802_CS);                          		//rx_data[] array
 
 	//executes for each LTC6802 in the daisy chain and packs the data
@@ -149,6 +151,7 @@ void LTC6802_stcvad()
   output_low(LTC6802_CS);
   spi_write(STCVAD);
   spi_write(STCVAD_PEC);
+  // wait unitil MISO is HIGH
   output_high(LTC6802_CS);
 }
 
@@ -303,6 +306,7 @@ uint8_t pec8_calc(uint8_t len, uint8_t *data){
 void spi_write_array(uint8_t len, uint8_t data[]){
   for (uint8_t i = 0; i < len; i++){
     spi_write((int8_t)data[i]);
+//    delay(1);
   }
 }
 
