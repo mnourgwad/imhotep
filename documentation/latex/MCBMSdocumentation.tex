@@ -1,0 +1,357 @@
+\documentclass[%
+DIV=12,
+abstract=on
+%a5paper,		% alle weiteren Papierformat einstellbar
+%landscape,		% Querformat
+12pt,			% Schriftgröße (12pt, 11pt (Standard))
+%BCOR1cm,		% Bindekorrektur, bspw. 1 cm
+%DIVcalc,		% führt die Satzspiegelberechnung neu aus
+%			 s. scrguide 2.4
+%twoside,		% Doppelseiten
+%twocolumn,		% zweispaltiger Satz
+%halfparskip*,		% Absatzformatierung s. scrguide 3.1
+%headsepline,		% Trennline zum Seitenkopf
+%footsepline,		% Trennline zum Seitenfuß
+%titlepage,		% Titelei auf eigener Seite
+%normalheadings,	% Überschriften etwas kleiner (smallheadings)
+%idxtotoc,		% Index im Inhaltsverzeichnis
+%liststotoc,		% Abb.- und Tab.verzeichnis im Inhalt
+%bibtotoc,		% Literaturverzeichnis im Inhalt
+%abstracton,		% Überschrift über der Zusammenfassung an
+%leqno,   		% Nummerierung von Gleichungen links
+%fleqn,			% Ausgabe von Gleichungen linksbündig
+%draft			% überlangen Zeilen in Ausgabe gekennzeichnet
+]
+{scrartcl} %scrreprt
+
+%\pagestyle{empty}	% keine Kopf und Fußzeile (k. Seitenzahl)
+\pagestyle{headings}	% lebender Kolumnentitel
+
+\setkomafont{title}{\normalfont\bfseries\small} %to set the tile font (I hate the default one ;))
+
+%% Deutsche Anpassungen %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{lmodern} 	%Type1-Schriftart für nicht-englische Texte
+
+\usepackage{amssymb} %provides various useful mathematical symbols
+\usepackage{amsthm}  %provides extended theorem environments
+\usepackage{amsmath} %provides the align environment
+
+\usepackage{xcolor}
+\usepackage[bookmarks,
+bookmarksopen=false,
+bookmarksnumbered=true,
+pdftex,pdfhighlight=/N,
+linkcolor=blue!60!black,
+urlcolor=blue!60!black,
+colorlinks=true,
+citecolor=green!20!black,
+pdftitle={Report of Professional Visit},
+pdfsubject={To: Fédération FCLAB, France},  % insert subtitle
+pdfkeywords={terramechanics, testbed, force measurement, soil contact interactions, impedance control, legged robots, simulation},
+pdfauthor={Asst. Prof. Dr.Ing. Mohammed Nour A. Ahmed}]{hyperref}
+
+\usepackage{tikz} %for the revision No. block on the margin of title (first) page
+%\usetikzlibrary{shapes}
+\definecolor{thegrey} {gray}{0.5}
+\definecolor{theshade}{gray}{0.94}
+\definecolor{theframe}{gray}{0.75}
+\definecolor{myLavender}{RGB}{239,136,184}%{230,6,85} %darker:WildStrawberry
+
+\usepackage{myboxedtheorem}
+%\newboxedtheorem[options]{theo}{Theorem}{thCounter}
+%boxcolor = black, titleboxcolor = black, background = white, titlebackground = white, titlecolor = black, thcounter=, size = .9\textwidth
+%\newboxedtheorem[boxcolor=blue!20, background=blue!5, titlebackground=blue!20, titleboxcolor = blue!20]{theo}{Theorem}{anything}
+\newboxedtheorem[boxcolor=theframe, background=theshade, titlebackground=thegrey,%
+titlecolor = white, titleboxcolor = thegrey, size = 0.8\textwidth]{myColoredBox}{}{}
+
+
+
+%% Packages für Grafiken & Abbildungen %%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx} 	%%Zum Laden von Grafiken
+%\usepackage{subfig} 	%%Teilabbildungen in einer Abbildung
+%\usepackage{pst-all}	%%PSTricks - nicht verwendbar mit pdfLaTeX
+\usepackage{wrapfig}
+\usepackage{pdfpages}
+\usepackage{float}
+
+\graphicspath{{./inkscapeFiles/}{figures/}}
+
+%% Bibliographiestil %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage{natbib}
+
+\usepackage{lastpage} %for last page number
+
+\usepackage[%
+automark,
+headsepline,                %% Separation line below the header
+%  footsepline,               %% Separation line above the footer
+%markuppercase
+]{scrpage2}
+
+\lefoot{Asst. Prof. Dr.Ing. {\bfseries Mohammed} Nour A. {\bfseries Ahmed}}                      %% Bottom left on even pages
+\lofoot{Asst. Prof. Dr.Ing. Mohammed Nour A. Ahmed}                      %% Bottom left on odd pages
+\refoot{\bfseries\pagemark}                      %% Bottom right on even pages
+\rofoot{\bfseries\pagemark}                      %% Bottom right on odd pages
+\cfoot{}                        %% Bottom center
+
+\lehead{\bfseries\headmark}    %% Top left on even pages
+\lohead{\bfseries\headmark}    %% Top left on odd pages
+\rehead{\bfseries\headmark}    %% Top right on even pages
+\rohead{}    %% Top right on odd pages
+\chead{}                                       %% Top center
+
+\automark[subsection]{section}
+
+\renewcommand*\pagemark{{\usekomafont{pagenumber}page\nobreakspace\textbf{\thepage} of \textbf{\pageref{LastPage}}}}
+
+\addtokomafont{pageheadfoot}{\normalfont\sffamily\footnotesize}
+\setkomafont{pagefoot}{\normalfont\sffamily\footnotesize}
+
+
+\begin{document}
+    
+    %\pagestyle{empty} %%Keine Kopf-/Fusszeilen auf den ersten Seiten.
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Ihr Artikel                                                       %%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    %% eigene Titelseitengestaltung %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %\begin{titlepage}
+    %Einsetzen der TXC Vorlage "Deckblatt" möglich
+    %\end{titlepage}
+    
+    %% Angaben zur Standardformatierung des Titels %%%%%%%%%%%%%%%%%%%%%%%%
+    %\titlehead{Titelkopf }
+    %\subject{Typisierung}
+    \title{Multicell Battery Management System (BMS)}
+    \subtitle{To: Fédération FCLAB,\\
+         University of Technology of Belfort Montbeliard (UTBM)\\Rue Thierry Mieg, F-90010 Belfort - France}
+    \author{\href{mailto:mnahmed@eng.zu.edu.eg}{\emph{\small  Asst. Prof. Dr.Ing.} \textbf{Mohammed Nour A. Ahmed}}\\
+    Computer and Systems Engineering Dept.,\\
+Faculty of Engineering, Zagazig University, Egypt}
+    %\and{Der Name des Co-Autoren}
+%    \thanks{Sponsors:Campus France-FRANCE and ASRT-EGYPT}			% entspr. \footnote im Fließtext
+    \date{\today}							% falls anderes, als das aktuelle gewünscht
+    %\publishers{last revision \today}
+    \publishers{\vspace{15 mm}\includegraphics[width=0.65\textwidth]{IMHOTEPShadow}}
+    
+        
+    
+%    Report of Professional Visit
+
+%    To
+
+%    Fédération FCLAB - University of Technology of Belfort Montbeliard (UTBM) 
+
+%    Rue Thierry Mieg, F-90010 Belfort - France
+
+%    
+%    From 26th  to 31st  December 2017
+
+%    By
+
+%    Asst. Prof. Dr.Ing. Mohammed Nour A. Ahmed
+
+%    Computer and Systems Engineering Dept.,
+
+%    Faculty of Engineering, Zagazig University, Egypt
+
+%    
+%    Sponsors:
+
+%    Campus France-FRANCE and ASRT-EGYPT
+
+    
+    
+    
+    
+    %% Widmungsseite %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %\dedication{Widmung}
+    
+    
+    
+%    \maketitle              % Titelei wird erzeugt
+%    
+%    \begin{tikzpicture}[overlay,remember picture]
+%    \node[fill=black!30,text=white, inner ysep=2pt, inner xsep=20pt, rectangle,rotate=90]
+%    at ([xshift=13mm,yshift=0mm]current page.west)
+%    {\footnotesize{last revision \today}};
+%    \end{tikzpicture}
+%    
+%    %% Zusammenfassung nach Titel, vor Inhaltsverzeichnis %%%%%%%%%%%%%%%%%
+%    \vfill
+%    \textbf{Sponsors}:\\
+%    \begin{tabular}{cc}
+%                ASRT-EGYPT&  Campus France-FRANCE\\ 
+%                \includegraphics[width=0.25\linewidth]{figures/ASRTlogo}&          \includegraphics[width=0.25\linewidth]{figures/CampusFranceLogo}\\ 
+%    \end{tabular} 
+%    
+%    \newpage
+    \pagestyle{empty}	% keine Kopf und Fußzeile (k. Seitenzahl)
+    
+     \begingroup% Story of Writing
+    \raggedleft
+    \vspace*{\baselineskip}
+    {\Huge\itshape Multicell Battery Management \\
+        System (BMS)\\[0.3\baselineskip]
+    {\Large within the IMHOTEP Project}}\\[5\baselineskip]
+    \includegraphics[width=0.45\textwidth]{IMHOTEPShadow}\\[5\baselineskip]
+    {\Large \href{http://www.mnahmed.faculty.zu.edu.eg}{\emph{\small  Asst. Prof. Dr.Ing.} \textbf{Mohammed Nour A. Ahmed}}\\
+        \href{mailto:mnahmed@eng.zu.edu.eg}{mnahmed@eng.zu.edu.eg}}\\[0.3\baselineskip]   
+    {\Large \href{mailto:ahmed_abdelbasit94@hotmail.com}{\emph{\small  Eng.} \textbf{Ahmed Abdelbasit}}\\
+    \href{mailto:ahmed_abdelbasit94@hotmail.com}{ahmed\_abdelbasit94@hotmail.com}}\\[0.3\baselineskip] 
+   
+    
+     {\Large \href{mailto:ahmedbadee17@gmail.com}{\emph{\small  Eng.}  \textbf{Ahmed AbdelBadee}}\\
+        \href{mailto:ahmedbadee17@gmail.com}{ahmedbadee17@gmail.com}\\
+     Computer and Systems Engineering Dept.,\\
+    Faculty of Engineering, Zagazig University, Egypt}\\
+    \par
+    \vfill
+    {\sffamily Sponsors: ASRT-EGYPT and  Campus France-FRANCE\\ 
+      \hfill \includegraphics[width=0.25\linewidth]{figures/ASRTlogo} \quad          \includegraphics[width=0.25\linewidth]{figures/CampusFranceLogo}}
+        \vspace*{\baselineskip}
+        \endgroup
+% =============================================================================
+% cover back page
+
+    \newpage
+    {\footnotesize\noindent\textcopyright  2018 Mohammed Nour A. Ahmed All rights reserved.\\
+    The Current Maintainer of this work/document is Mohammed Nour A. Ahmed.\\
+    The work consists of this document and all material contained within in addition to all software and/or hardware described unless otherwise noticed.\\~\\
+   % get git version number to be used as the version no. of the doc.
+   \immediate\write18{./myGitVer.sh.command \jobname.txt}
+    Version: \input{\jobname.txt}}
+
+    \vskip 6ex
+
+   \noindent\emph{\small Asst.Prof.Dr.Ing.} \textbf{Mohammed Nour A. Ahmed}\\
+    Computer and Systems Engineering Dept.,\\
+    Faculty of Engineering, Zagazig University,\\
+    44519 Zagazig, Egypt\\
+    \url{http://www.mnahmed.faculty.zu.edu.eg}\\
+    email: \href{mailto:mnahmed@eng.zu.edu.eg}{mnahmed@eng.zu.edu.eg}\\
+    web: \url{https://mnourgwad.github.io}
+
+    \vskip 12ex
+
+    \noindent\begin{tabular}{lp{10cm}}
+       \textbf{Project title}: & Hydrogen Storage Technology for Emergence Green Solutions
+       of Renewable Energy-Mix Grids (HyGrid)\\ 
+        \textbf{Arabic}:&  \includegraphics[width=\linewidth]{figures/arabicTitle} \\ 
+        \textbf{Contract}: & PHC IMHOTEP 2017 \\ 
+         \textbf{Number}:&  37950RD\\ 
+    \end{tabular} 
+
+    \vfill
+   \begin{abstract}
+      \noindent\textbf{Abstract}\\
+      \noindent This report presents the details of design, implementation, and test of a Multicell Battery Management System (BMS) within the framework of the IMHOTEP project.
+\end{abstract}
+    \clearpage
+            \pagestyle{scrheadings}
+% =============================================================================
+    \tableofcontents
+    %\listoftables
+    %\listoffigures
+    %\newpage
+% =============================================================================
+
+    \clearpage
+    \section{Introduction}
+This report presents the technical details of work done in the framework of the two years French-Egyptian scientific research project titled: "Hydrogen Storage Technology for Emergence Green Solutions of Renewable Energy-Mix Grids (\textbf{HyGrid})" : PHC IMHOTEP 2017, Project No. 37950RD, between both Faculty of Engineering-Zagazig University in Egypt and the University of Technology of Belfort Montbeliard (UTBM) in France.
+
+
+In the following sections, the work carried on is presented. The work is mostly on developing and implementing a multicell Battery monitor based on LTC6802G-1 Chip (BMS).
+
+\section{Multicell Battery Monitor Based on LTC6802G-1 Chip (BMS)}
+The presented battery management system (BMS) consists of an LTC6802G-1 battery stack monitoring chip. This chip can monitor as well as balance a lithium battery pack consisting of no more than 12 cells. However, the chip registers need to be programmed via a microcontroller. The communication is done via Serial Peripheral Interface (SPI) mechanism. Once set-up, the LTC6802-2 chip sends the voltage data to the microcontroller via the SPI interface. The diagram given in Fig.\ref{fig:typicalapplication} shows the typical setup for a single monitoring chip connected to a microcontroller. 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/typicalApplication}
+    \caption{Typical application of LTC6802G-1 chip}
+    \label{fig:typicalapplication}
+\end{figure}
+
+\subsection{LTC6802G-1 Chip Overview}
+The LTC6802G is a data acquisition IC capable of measuring the voltage of 12 series connected battery cells.
+An input multiplexer connects the batteries to a 12-bit delta-sigma analog-to-digital converter (ADC). 
+Communication between the LTC6802G and a host microcontroller is handled by an SPI compatible serial interface. 
+As shown in Fig. \ref{fig:typicalapplication}, the LTC6802G-1 can pass data up and down a stack of devices using simple diodes for
+isolation.  The LTC6802G also contains circuitry to balance cell voltages. Internal MOSFETs can be used to discharge cells. These internal MOSFETs can also be used to control external balancing circuits. 
+
+Figure 1 illustrates cell balancing by internal discharge. It is important to note that the LTC6802G makes no decisions about turning on/off the internal MOSFETs. This is completely controlled by the host processor. The host processor writes values to a configuration register inside the LTC6802G to control the switches. 
+
+The LTC6802G has three modes of operation: hardware shutdown, standby and measure. Hardware shutdown is
+a true zero power mode. Standby mode is a power saving state where all circuits except the serial interface are turned off. In measure mode, the LTC6802G is used to measure cell voltages and store the results in memory. Measure mode will also monitor each cell voltage for overvoltage (OV) and undervoltage (UV) conditions.
+
+\vspace{0.3cm}%
+\noindent\colorbox{myLavender!15}{\parbox{\textwidth}{\vspace{0.1cm}%
+    For full details of the  LTC6802G-1 chip, please refer to  its datasheet provided in App.\ref{ch:Datasheet}.%
+    \vspace{0.1cm}}}
+ 
+\section{BMS Components}
+After throughly revising the chip datasheet, we can see that it is required to build the hardware components and provide the required software to drive and control the hardware.
+\subsection{BMS Hardware}
+The hardware implementation task was mainly performed by the FC-Lab team (Mr. Eltoumi). We worked together on correcting some errors in the first circuit schematic. Then the hardware implementation was carried out in the Lab. The first test of the circuit connection is shown in Fig.\ref{fig:hwconnection}.  In this circuit, Arduino Uno microcontroller was used.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/HWconnection}
+    \caption{First hardware connection test}
+    \label{fig:hwconnection}
+\end{figure}
+
+The circuit did not function as required, so I provided Mr. Eltoumi a detailed troubleshooting steps and suggestions for further developing the hardware.
+
+\subsection{BMS Software}
+The software implementation for the system has the general architecture shown in Fig.\ref{fig:softwarearchitecture}. As depicted in that diagram, the software can be divided into three main components: hardware driver, chip communication and control functions, and Android/IoT side.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/SoftwareArchitecture}
+    \caption{Software architecture}
+    \label{fig:softwarearchitecture}
+\end{figure}
+
+The visiting professor started work on the software during the visit and continued working on it after returning back to Egypt. The hardware driver driver, SPI communication part and of chip control functions are finished 
+
+\vspace{0.3cm}%
+\noindent\colorbox{myLavender!15}{\parbox{\textwidth}{\vspace{0.1cm}%
+The full code can be found at: \url{https://github.com/mnourgwad/imhotep}
+        \vspace{0.1cm}}}
+%---------------------------------------------------------------------------------
+
+
+\newpage
+ %A.Abdelbasit Part
+\input{arduinoSide.tex}
+%---------------------------------------------------------------------------------
+
+\newpage
+ %A.AbdelBadee Part
+\input{androidSide.tex}
+%---------------------------------------------------------------------------------
+
+\newpage
+% Internet of Things Part
+\input{IoT.tex}
+%---------------------------------------------------------------------------------
+
+% References
+\nocite{*}
+\bibliographystyle{apalike}
+%\bibliographystyle{ieeetran}
+\bibliography{myRefs}
+%---------------------------------------------------------------------------------
+
+\newpage
+\appendix
+
+\section{Datashhets}\label{ch:Datasheet}
+%\newpage
+\includepdf[pages=-]{figures/LTC6802-2.pdf}
+\end{document}
