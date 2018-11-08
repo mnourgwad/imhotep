@@ -1,0 +1,13 @@
+% Encoding: UTF-8
+
+@Misc{Ahmed2017,
+  author =       {Mohammed Nour A. Ahmed},
+  title =        {Personal web site},
+  howpublished = {\url{https://mnourgwad.github.io}},
+  year =         {2017},
+  note =         {[Online; accessed: \today]},
+  owner =        {moah},
+  timestamp =    {2018.01.18}
+}
+
+@Comment{jabref-meta: DATABASE_TYPE:BibTeX;}
